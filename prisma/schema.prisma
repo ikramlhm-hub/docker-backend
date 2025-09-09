@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id       Int      @id @default(autoincrement())
+  name     String
+  musics   Music[]
+  createdAt DateTime @default(now())
+}
+
+model Music {
+  id        Int     @id @default(autoincrement())
+  title     String
+  artist    String
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId Int
+  votes     Vote[]
+  createdAt DateTime @default(now())
+}
+
+model Vote {
+  id      Int     @id @default(autoincrement())
+  userId  String
+  music   Music   @relation(fields: [musicId], references: [id])
+  musicId Int
+
+  @@unique([userId, musicId]) //empêche un user de voter 2 fois pour la même musique
+}
+
