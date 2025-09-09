@@ -18,12 +18,9 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "node-fetch": "^3.3.2",
-<<<<<<< HEAD
-    "prisma": "^6.15.0"
-=======
+    "prisma": "^6.15.0",
     "nodemon": "^3.1.10",
     "playwright": "^1.55.0",
     "puppeteer": "^24.19.0"
->>>>>>> origin/bastienscrapper
   }
 }
