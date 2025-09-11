@@ -21,6 +21,36 @@ async function loadUsers() {
   });
 }
 
+async function requestLogin() {
+  const email = document.getElementById("userSelect").value;
+  if (!email) return alert("Sélectionnez un utilisateur");
+  const res = await fetchJson("/api/auth/request-login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  });
+
+  if (res.token) {
+    const token = prompt("Copiez le token affiché dans la console / réponse backend :"); // pour dev
+    await loginWithToken(token);
+  } else {
+    alert("Erreur lors de la demande de login");
+  }
+}
+
+async function loginWithToken(token) {
+  const res = await fetchJson(`/api/auth/login/${token}`, { method: "POST" });
+  if (res.token) {
+    jwt = res.token;
+    currentUser = res.user;
+    document.getElementById("me").textContent = `Connecté: ${currentUser.firstname} ${currentUser.lastname}`;
+    document.getElementById("submitTrack").style.display = "block";
+    await loadSessions();
+  } else {
+    alert(res.error || "Erreur login");
+  }
+}
+
 async function login() {
   const email = document.getElementById("userSelect").value;
   const res = await fetchJson("/api/users/login", {
@@ -92,7 +122,7 @@ async function submitTrack() {
 }
 
 // bind
-document.getElementById("btnLogin").addEventListener("click", login);
+document.getElementById("btnLogin").addEventListener("click", requestLogin);
 document.getElementById("loadTracks").addEventListener("click", loadTracks);
 document.getElementById("submitTrackBtn").addEventListener("click", submitTrack);
 

@@ -12,9 +12,6 @@ import votesRouter from "./controllers/votes.js";
 import usersRouter from "./controllers/users.js"; // we'll add simple users route
 import { scheduleDailyScraper } from "./jobs/scraper.js";
 import prisma from "./config/prisma.js";
-import { scrapAndUpsertSessions } from "./services/scraping.js";
-
-scrapAndUpsertSessions("https://paris-02-2.hyperplanning.fr/hp/panneauinformations.html?id=PA3", "//tr");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

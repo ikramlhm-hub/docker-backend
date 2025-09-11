@@ -1,10 +1,11 @@
 import express from "express";
 import prisma from "../config/prisma.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Voter pour une musique
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { musicId, userId } = req.body;
 
   try {

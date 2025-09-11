@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Request login link (we create auth token, in prod send by email)
 router.post("/request-login", async (req, res) => {
+  console.log("Login link requested for:", req.body);
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "Email requis" });
   const user = await prisma.user.findUnique({ where: { email }});
