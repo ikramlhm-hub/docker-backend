@@ -20,6 +20,6 @@ COPY . .
 EXPOSE 3000
 
 # Commande de démarrage
-CMD ["node", "src/index.js"]
+CMD ["npx", "nodemon", "src/index.js"]
 # Nettoyer le cache npm pour réduire la taille de l'image
 RUN npm cache clean --force
