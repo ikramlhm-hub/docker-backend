@@ -2,6 +2,7 @@
 CREATE TABLE "Session" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
+    "date" DATETIME NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -22,3 +23,9 @@ CREATE TABLE "Vote" (
     "musicId" INTEGER NOT NULL,
     CONSTRAINT "Vote_musicId_fkey" FOREIGN KEY ("musicId") REFERENCES "Music" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Session_name_date_key" ON "Session"("name", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Vote_userId_musicId_key" ON "Vote"("userId", "musicId");
