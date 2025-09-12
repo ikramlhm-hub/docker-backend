@@ -12,6 +12,7 @@ import votesRouter from "./controllers/votes.js";
 import usersRouter from "./controllers/users.js"; // we'll add simple users route
 import { scheduleDailyScraper } from "./jobs/scraper.js";
 import prisma from "./config/prisma.js";
+import { scrapAndUpsertSessions } from "./services/scraping.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
