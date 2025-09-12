@@ -1,41 +1,231 @@
 <!doctype html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Music Voting</title>
+  <title>Playlist de la promo</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Reset & base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #f5f7fa, #e8ecf5);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: #1db954;
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    header h1 { margin: 0; font-size: 34px; }
+    header p { margin-top: 8px; font-size: 16px; opacity: 0.9; }
+
+    /* Main */
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* Sections */
+    section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      opacity: 0;
+      transform: translateY(15px);
+      animation: fadeIn 0.6s forwards;
+    }
+    section:nth-of-type(1) { animation-delay: 0.1s; }
+    section:nth-of-type(2) { animation-delay: 0.3s; }
+    section:nth-of-type(3) { animation-delay: 0.5s; }
+    section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #222;
+      border-left: 5px solid #1db954;
+      padding-left: 10px;
+      margin-bottom: 15px;
+    }
+
+    label { display: block; margin-top: 10px; font-weight: 600; }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    select:focus, input:focus {
+      border-color: #1db954;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(29,185,84,0.2);
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 12px 20px;
+      background: #1db954;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:hover { background: #159c42; }
+    button:active { transform: scale(0.96); }
+
+    #me {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #1db954;
+      min-height: 20px;
+      transition: opacity 0.3s;
+    }
+
+    #submitTrack { display: none; }
+
+    .flex {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .flex > section { flex: 1; min-width: 300px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    th {
+      background: #f9fafb;
+      font-size: 14px;
+      color: #444;
+    }
+    td { font-size: 14px; }
+    td button {
+      background: #ff3d3d;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    td button:hover { background: #cc2e2e; }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <h1>Music Voting</h1>
+  <header>
+    <h1>Playlist de la promo</h1>
+    <p>Proposez et votez pour vos morceaux pendant les sessions</p>
+  </header>
 
-  <section id="auth">
-    <h2>Connexion (dev)</h2>
-    <select id="userSelect"></select>
-    <button id="btnLogin">Se connecter</button>
-    <div id="me"></div>
-  </section>
+  <main>
+    <!-- Connexion -->
+    <section id="auth">
+      <h2>Connexion</h2>
+      <label for="userSelect">Qui êtes-vous ?</label>
+      <select id="userSelect"></select>
+      <button id="btnLogin">Se connecter</button>
+      <div id="me"></div>
+    </section>
 
-  <section id="sessions">
-    <h2>Sessions</h2>
-    <select id="sessionSelect"></select>
-    <button id="loadTracks">Charger morceaux</button>
-  </section>
+    <!-- Choix session -->
+    <section id="sessions">
+      <h2>Sessions en cours</h2>
+      <label for="sessionSelect">Sélectionnez votre cours :</label>
+      <select id="sessionSelect"></select>
+      <button id="loadTracks">Voir la playlist</button>
+    </section>
 
-  <section id="submitTrack" style="display:none;">
-    <h2>Proposer un morceau</h2>
-    <input id="title" placeholder="Titre" />
-    <input id="artist" placeholder="Artiste" />
-    <button id="submitTrackBtn">Soumettre</button>
-  </section>
+    <!-- Bloc contribute + playlist côte à côte -->
+    <div class="flex">
+      <!-- Proposer -->
+      <section id="submitTrack">
+        <h2>Proposer un morceau</h2>
+        <label for="title">Titre</label>
+        <input id="title" placeholder="Titre du morceau" />
+        <label for="artist">Artiste</label>
+        <input id="artist" placeholder="Nom de l'artiste" />
+        <button id="submitTrackBtn">Ajouter</button>
+      </section>
 
-  <section id="tracks">
-    <h2>Morceaux</h2>
-    <table id="tracksTable">
-      <thead><tr><th>Titre</th><th>Artiste</th><th>Soumis par</th><th>Votes</th><th>Action</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
+      <!-- Playlist -->
+      <section id="tracks">
+        <h2>Playlist & Votes</h2>
+        <table id="tracksTable">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Artiste</th>
+              <th>Soumis par</th>
+              <th>Votes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+  </main>
 
   <script src="/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnLogin = document.getElementById("btnLogin");
+      const meDiv = document.getElementById("me");
+      const btnSubmit = document.getElementById("submitTrackBtn");
+
+      // Feedback connexion
+      btnLogin?.addEventListener("click", () => {
+        meDiv.style.opacity = 0.6;
+        meDiv.textContent = "Connexion en cours...";
+        setTimeout(() => {
+          meDiv.textContent = "Connecté avec succès !";
+          meDiv.style.opacity = 1;
+        }, 1000);
+      });
+
+      // Animation sur ajout morceau
+      btnSubmit?.addEventListener("click", () => {
+        btnSubmit.textContent = "Ajouté ✔";
+        btnSubmit.disabled = true;
+        setTimeout(() => {
+          btnSubmit.textContent = "Ajouter";
+          btnSubmit.disabled = false;
+        }, 1500);
+      });
+    });
+  </script>
 </body>
 </html>
