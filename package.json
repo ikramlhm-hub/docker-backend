@@ -7,13 +7,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "scrape": "node src/services/scraper.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.1",
     "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -21,7 +22,7 @@
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.10",
     "playwright": "^1.55.0",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.1",
     "puppeteer": "^24.19.0"
   }
 }

@@ -3,37 +3,102 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite"  // ou "postgresql" en production
   url      = env("DATABASE_URL")
 }
 
-model Session {
-  id        Int      @id @default(autoincrement())
-  name      String
-  date      DateTime
-  musics    Music[]
-  createdAt DateTime @default(now())
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  firstname   String
+  lastname    String
+  promotion   String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  lastLogin   DateTime?
 
-  @@unique([name, date], name: "name_date") //clé composite avec nom explicite
+  // Relations
+  votes       Vote[]
+  tracks      Track[]
+  authTokens  AuthToken[]  
+
+  @@map("users")
 }
 
 
+model Session {
+  id          Int      @id @default(autoincrement())
+  subject     String
+  teacher     String
+  promotion   String
+  classroom   String
+  date        String   // Format: YYYY-MM-DD
+  startTime   String   // Format: HH:MM
+  endTime     String   // Format: HH:MM
+  createdAt   DateTime @default(now())
 
-model Music {
-  id        Int      @id @default(autoincrement())
-  title     String
-  artist    String
-  session   Session  @relation(fields: [sessionId], references: [id])
-  sessionId Int
-  votes     Vote[]
-  createdAt DateTime @default(now())
+  // Relations
+  tracks      Track[]
+  votes       Vote[]
+
+  @@map("sessions")
+  @@unique([subject, date], name: "subject_date") // ⚡ clé composite
+}
+
+model Track {
+  id          Int      @id @default(autoincrement())
+  artist      String
+  title       String
+  submittedAt DateTime @default(now())
+
+  // Relations
+  submittedBy User     @relation(fields: [userId], references: [id])
+  userId      Int
+  session     Session  @relation(fields: [sessionId], references: [id])
+  sessionId   Int
+  votes       Vote[]
+
+  @@map("tracks")
 }
 
 model Vote {
-  id      Int     @id @default(autoincrement())
-  userId  String
-  music   Music   @relation(fields: [musicId], references: [id])
-  musicId Int
+  id        Int      @id @default(autoincrement())
+  votedAt   DateTime @default(now())
 
-  @@unique([userId, musicId])
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  track     Track    @relation(fields: [trackId], references: [id])
+  trackId   Int
+  session   Session  @relation(fields: [sessionId], references: [id])
+  sessionId Int
+
+  // Contrainte: un vote par utilisateur par jour
+  @@unique([userId, sessionId])
+  @@map("votes")
+}
+
+model AuthToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@map("auth_tokens")
+}
+
+model PreRegisteredUser {
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  firstname String
+  lastname  String
+  promotion String
+  isUsed    Boolean @default(false)
+
+  @@map("pre_registered_users")
 }
