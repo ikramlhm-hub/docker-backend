@@ -2,12 +2,30 @@ let jwt = null;
 let currentUser = null;
 
 
-async function fetchJson(url, opts={}) {
-  if (!opts.headers) opts.headers = {};
-  if (jwt) opts.headers.Authorization = `Bearer ${jwt}`;
+async function fetchJson(url, opts = {}) {
+  opts.headers = opts.headers || {};
+  opts.credentials = "include";
+  if (!opts.headers["Content-Type"] && opts.body) opts.headers["Content-Type"] = "application/json";
   const r = await fetch(url, opts);
   return r.json();
 }
+
+async function checkAuthOnLoad() {
+  const res = await fetchJson("/api/auth/me"); // cookie envoyé automatiquement
+  if (res.user) {
+    currentUser = res.user;
+    document.getElementById("me").textContent = `Connecté: ${currentUser.firstname} ${currentUser.lastname}`;
+    document.getElementById("submitTrack").style.display = "block";
+  }
+}
+
+window.addEventListener("load", async () => {
+  await loadUsers();    // si tu veux la liste
+  await checkAuthOnLoad();
+  await loadSessions();
+});
+
+
 
 async function loadUsers() {
   const users = await fetchJson("/api/users");
@@ -26,30 +44,29 @@ async function requestLogin() {
   if (!email) return alert("Sélectionnez un utilisateur");
   const res = await fetchJson("/api/auth/request-login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email })
   });
-
+  // en dev on reçoit le token dans la réponse et on le colle ensuite
   if (res.token) {
-    const token = prompt("Copiez le token affiché dans la console / réponse backend :"); // pour dev
-    await loginWithToken(token);
+    const token = prompt("Token (collez le token renvoyé par le serveur) :", res.token);
+    if (token) await loginWithToken(token);
   } else {
     alert("Erreur lors de la demande de login");
   }
 }
 
 async function loginWithToken(token) {
+  // IMPORTANT: credentials included by fetchJson, server will set cookie
   const res = await fetchJson(`/api/auth/login/${token}`, { method: "POST" });
-  if (res.token) {
-    jwt = res.token;
+  if (res.user) {
     currentUser = res.user;
     document.getElementById("me").textContent = `Connecté: ${currentUser.firstname} ${currentUser.lastname}`;
     document.getElementById("submitTrack").style.display = "block";
-    await loadSessions();
   } else {
     alert(res.error || "Erreur login");
   }
 }
+
 
 async function login() {
   const email = document.getElementById("userSelect").value;
@@ -65,6 +82,11 @@ async function login() {
     document.getElementById("submitTrack").style.display = "block";
     await loadSessions();
   } else alert("Erreur login");
+}
+
+async function logout() {
+  await fetchJson("/api/users/logout", { method: "POST" });
+  document.location.reload();
 }
 
 async function loadSessions() {
@@ -111,11 +133,13 @@ async function submitTrack() {
   const artist = document.getElementById("artist").value;
   const sessionId = document.getElementById("sessionSelect").value;
   if (!title || !artist) return alert("Titre et artiste requis");
+  console.log({ sessionId, title, artist });
   const res = await fetchJson("/api/tracks", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sessionId, title, artist })
   });
+  console.log(res);
   document.getElementById("title").value = "";
   document.getElementById("artist").value = "";
   loadTracks();

@@ -5,6 +5,29 @@ import crypto from "crypto";
 
 const router = express.Router();
 
+import { verify } from "../utils/jwt.js";
+
+router.get("/me", async (req, res) => {
+  try {
+    const token = req.cookies?.jwt || req.headers?.authorization?.split(" ")[1];
+    if (!token) return res.status(200).json({ user: null });
+
+    const payload = verify(token);
+    if (!payload?.authTokenId) return res.status(200).json({ user: null });
+
+    const authToken = await prisma.authToken.findUnique({ where: { id: payload.authTokenId }});
+    if (!authToken || authToken.isUsed || authToken.expiresAt < new Date()) {
+      return res.status(200).json({ user: null });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: payload.userId }});
+    return res.json({ user });
+  } catch (err) {
+    return res.status(200).json({ user: null });
+  }
+});
+
+
 // Request login link (we create auth token, in prod send by email)
 router.post("/request-login", async (req, res) => {
   console.log("Login link requested for:", req.body);
@@ -39,19 +62,20 @@ router.post("/login/:token", async (req, res) => {
   // Mark used
   await prisma.authToken.update({ where: { id: record.id }, data: { isUsed: true }});
 
-  // Create JWT for frontend usage
-  const jwt = sign({ userId: record.user.id });
+  // Create JWT that includes authTokenId
+  const jwt = sign({ authTokenId: record.id, userId: record.user.id });
 
-  // Update last login
-  await prisma.user.update({ where: { id: record.user.id }, data: { lastLogin: new Date() }});
+  // Set cookie HttpOnly (sent to browser)
+  res.cookie("jwt", jwt, {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 365, // 1 an
+    sameSite: "lax", // pour dev ok ; si cross-site strict -> sameSite:'none' + secure:true 
+    secure: process.env.NODE_ENV === "production",
+    path: "/"
+  });
 
-  res.json({ token: jwt, user: record.user });
-});
-
-// Get me
-router.get("/me", async (req, res) => {
-  // expects JWT in header; handled by frontend via /users/me route (or auth middleware)
-  res.json({ message: "utiliser middleware auth" });
+  // Return user (no need to return jwt because we use cookie)
+  res.json({ user: record.user });
 });
 
 export default router;

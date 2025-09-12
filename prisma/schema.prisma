@@ -27,16 +27,17 @@ model User {
 
 model Session {
   id          Int      @id @default(autoincrement())
-  subject     String   @unique
+  subject     String   
   hour        String
   room        String
   matiere     String
   teacher     String
+  date        DateTime
 
   // Relations
   tracks      Track[]
   votes       Vote[]
-
+  @@unique([subject, date])
   @@map("sessions")
 }
 

@@ -1,10 +1,17 @@
 import express from "express";
 import prisma from "../config/prisma.js";
+import { startOfDay, endOfDay } from "date-fns";
 const router = express.Router();
 
 // Get all sessions
 router.get("/", async (req, res) => {
-  const sessions = await prisma.session.findMany({ orderBy: { subject: "asc" }});
+  const today = new Date();
+  const sessions = await prisma.session.findMany({ where: {
+      date: {
+        gte: startOfDay(today), // >= début de journée
+        lte: endOfDay(today),   // <= fin de journée
+      },
+    },orderBy: { subject: "asc" }});
   res.json(sessions);
 });
 

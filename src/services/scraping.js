@@ -1,6 +1,15 @@
 import { chromium } from "playwright";
 import prisma from "../config/prisma.js";
 
+function parseStartHour(hourStr) {
+  // ex: "09h0012h30" → "09h00"
+  const match = hourStr.match(/^(\d{2})h(\d{2})/);
+  if (!match) return null;
+  const [_, hh, mm] = match;
+  return { hh: parseInt(hh, 10), mm: parseInt(mm, 10) };
+}
+
+
 export async function scrapAndUpsertSessions(url, xpathRows) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -20,6 +29,7 @@ export async function scrapAndUpsertSessions(url, xpathRows) {
     if (texts.slice(0, 5).some((t) => t === "")) {
       continue; // ignorer si une case est vide, y compris la 5ᵉ
     }
+    
     console.log("Scraped row:", texts);
     const hour = texts[0] || "Unknown";
     const room = texts[1] || null;
@@ -27,8 +37,14 @@ export async function scrapAndUpsertSessions(url, xpathRows) {
     const teacher = texts[3] || null;
     const classe = texts[4] || hour;
 
+    const start = parseStartHour(hour);
+    if (!start || start.hh >= 13) {
+      continue;
+    }
+    const today = new Date();
+today.setHours(0, 0, 0, 0);
     await prisma.session.upsert({
-      where: { subject: classe },
+      where: { subject_date: { subject: classe, date: today } }, // clé composite      
       update: {
         hour, room, matiere, teacher
       },
@@ -37,7 +53,8 @@ export async function scrapAndUpsertSessions(url, xpathRows) {
         hour,
         room,
         matiere,
-        teacher
+        teacher,
+        date: today
       }
     });
   }

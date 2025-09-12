@@ -7,6 +7,7 @@ const router = express.Router();
 // Create a track (requires auth)
 router.post("/", auth, async (req, res) => {
   const { sessionId, title, artist } = req.body;
+  console.log({ sessionId, title, artist, user: req.user });
   if (!sessionId || !title || !artist) return res.status(400).json({ error: "Données incomplètes" });
    const session = await prisma.session.findUnique({ where: { id: Number(sessionId) } });
   if (!session) return res.status(404).json({ error: "Session introuvable" });
