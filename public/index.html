@@ -1,107 +1,41 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Tableau Hyperplanning</title>
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      padding: 20px; 
-      background: #fafafa;
-    }
-    h1 {
-      color: #333;
-      text-align: center;
-    }
-    #loading {
-      text-align: center;
-      font-style: italic;
-      color: #666;
-    }
-    table { 
-      border-collapse: collapse; 
-      width: 100%; 
-      margin-top: 20px;
-      background: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    th, td { 
-      border: 1px solid #ddd; 
-      padding: 10px; 
-      text-align: left; 
-    }
-    th { 
-      background-color: #f4f4f4; 
-      font-weight: bold; 
-    }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-  </style>
+  <meta charset="utf-8">
+  <title>Music Voting</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <h1>Tableau Hyperplanning</h1>
-  <div id="loading">Chargement des données...</div>
-  <table id="table" style="display:none;">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+  <h1>Music Voting</h1>
 
-  <script>
-    async function loadTable() {
-      const table = document.getElementById("table");
-      const loading = document.getElementById("loading");
+  <section id="auth">
+    <h2>Connexion (dev)</h2>
+    <select id="userSelect"></select>
+    <button id="btnLogin">Se connecter</button>
+    <div id="me"></div>
+  </section>
 
-      try {
-        const res = await fetch("/scrape");
-        if (!res.ok) throw new Error("Erreur API " + res.status);
-        const data = await res.json();
+  <section id="sessions">
+    <h2>Sessions</h2>
+    <select id="sessionSelect"></select>
+    <button id="loadTracks">Charger morceaux</button>
+  </section>
 
-        if (!data.data || data.data.length === 0) {
-          loading.textContent = "Aucune donnée trouvée aujourd'hui.";
-          return;
-        }
+  <section id="submitTrack" style="display:none;">
+    <h2>Proposer un morceau</h2>
+    <input id="title" placeholder="Titre" />
+    <input id="artist" placeholder="Artiste" />
+    <button id="submitTrackBtn">Soumettre</button>
+  </section>
 
-        // Colonnes à afficher (selon l'énoncé)
-        const columns = ["subject", "teacher", "promotion", "classroom", "date", "startTime", "endTime"];
+  <section id="tracks">
+    <h2>Morceaux</h2>
+    <table id="tracksTable">
+      <thead><tr><th>Titre</th><th>Artiste</th><th>Soumis par</th><th>Votes</th><th>Action</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-        // Reset
-        table.querySelector("thead").innerHTML = "";
-        table.querySelector("tbody").innerHTML = "";
-
-        // En-têtes
-        const headerRow = document.createElement("tr");
-        columns.forEach(col => {
-          const th = document.createElement("th");
-          th.textContent = col;
-          headerRow.appendChild(th);
-        });
-        table.querySelector("thead").appendChild(headerRow);
-
-        // Corps
-        data.data.forEach(session => {
-          const tr = document.createElement("tr");
-          columns.forEach(col => {
-            const td = document.createElement("td");
-            td.textContent = session[col] ?? "-";
-            tr.appendChild(td);
-          });
-          table.querySelector("tbody").appendChild(tr);
-        });
-
-        // Affichage
-        loading.style.display = "none";
-        table.style.display = "table";
-      } catch (err) {
-        console.error("Erreur:", err);
-        loading.textContent = "❌ Impossible de charger les données.";
-      }
-    }
-
-    loadTable();
-  </script>
+  <script src="/app.js"></script>
 </body>
 </html>

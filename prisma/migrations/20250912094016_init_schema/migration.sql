@@ -1,26 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Music` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Session` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Vote` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Music";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Session";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Vote";
-PRAGMA foreign_keys=on;
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -93,6 +70,9 @@ CREATE TABLE "pre_registered_users" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sessions_subject_date_startTime_classroom_key" ON "sessions"("subject", "date", "startTime", "classroom");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "votes_userId_sessionId_key" ON "votes"("userId", "sessionId");
