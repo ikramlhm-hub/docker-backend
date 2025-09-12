@@ -12,7 +12,7 @@ router.post("/", auth, async (req, res) => {
   if (!session) return res.status(404).json({ error: "Session introuvable" });
 
   // Vérification promotion
-  if (session.subject !== req.user.promotion) {
+  if (session.promotion !== req.user.promotion) {
     return res.status(403).json({ error: "Vous ne pouvez pas publier sur une autre promotion" });
   }
   try {

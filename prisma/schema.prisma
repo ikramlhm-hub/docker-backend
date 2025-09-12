@@ -31,7 +31,7 @@ model Session {
   teacher   String
   promotion String
   classroom String
-  date      String // ⚡ Format: YYYY-MM-DD
+  date      DateTime // ⚡ Format: YYYY-MM-DD
   startTime String // Format: HH:MM
   endTime   String // Format: HH:MM
   createdAt DateTime @default(now())
@@ -40,7 +40,7 @@ model Session {
   tracks Track[]
   votes  Vote[]
 
-  @@unique([subject, date, startTime, classroom], name: "session_unique") // ⚡ utile pour éviter doublons
+  @@unique([subject, date], name: "session_unique") // ⚡ utile pour éviter doublons
   @@map("sessions")
 }
 

@@ -14,37 +14,50 @@ import { scheduleDailyScraper } from "./jobs/scraper.js";
 import prisma from "./config/prisma.js";
 import { scrapAndUpsertSessions } from "./services/scraping.js";
 
-
-const url = "https://paris-02-2.hyperplanning.fr/hp/panneauinformations.html?id=PA3";
-const xpath = "//*[@id='interfacePanneauInformations_objetPanneauInformation_donnees']//tr";
-
-await scrapAndUpsertSessions(url, xpath);
-    console.log("scrapping DONE !");
-
-
-
+// ======================
+// Config serveur
+// ======================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../public")));
 
+// Routes API
 app.use("/api/auth", authRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/tracks", tracksRouter);
 app.use("/api/votes", votesRouter);
 app.use("/api/users", usersRouter);
 
+// Frontend (index.html)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
-// Start jobs
-scheduleDailyScraper();
+// ======================
+// Lancement du serveur
+// ======================
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+  // Scraping initial au démarrage
+  const url = "https://paris-02-2.hyperplanning.fr/hp/panneauinformations.html?id=PA3";
+  const xpath = "//*[@id='interfacePanneauInformations_objetPanneauInformation_donnees']//tr";
+
+  try {
+    await scrapAndUpsertSessions(url, xpath);
+    console.log(" Scraping DONE !");
+  } catch (err) {
+    console.error("Scraping failed:", err);
+  }
+
+  // Cron job quotidien
+  scheduleDailyScraper();
+});

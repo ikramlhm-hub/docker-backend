@@ -14,7 +14,7 @@ router.post("/", auth, async (req, res) => {
   // Load track to get sessionId
   const track = await prisma.track.findUnique({ where: { id: Number(trackId) }, include: { session: true } });
   if (!track) return res.status(404).json({ error: "Track introuvable" });
-  if (track.session.subject !== req.user.promotion) {
+  if (track.session.promotion !== req.user.promotion) {
     return res.status(403).json({ error: "Vous ne pouvez pas voter pour une autre promotion" });
   }
   const sessionId = track.sessionId;
