@@ -1,26 +1,26 @@
-# Image de base Node.js officielle (bullseye pour compatibilité Playwright)
-FROM node:22-bullseye
+# 1. Choisir une image Node.js officielle
+FROM node:20
 
-# Définir le répertoire de travail
+# 2. Définir le répertoire de travail
 WORKDIR /app
 
-# Copier package.json et package-lock.json
+# 3. Copier le package.json et package-lock.json pour installer les dépendances
 COPY package*.json ./
 
-# Installer les dépendances
+# 4. Installer les dépendances
 RUN npm install
 
-# Installer les navigateurs nécessaires pour Playwright
+# 5. Installer Playwright avec les navigateurs nécessaires
 RUN npx playwright install --with-deps
 
-# Copier tout le code source
+# 6. Copier le reste du code de l'application
 COPY . .
 
-# Exposer le port
+# 7. Générer le client Prisma (si tu utilises Prisma)
+RUN npx prisma generate
+
+# 8. Exposer le port de l'application (optionnel selon ton app)
 EXPOSE 3000
 
-# Commande de démarrage
-CMD ["npx", "nodemon", "src/index.js"]
-
-# Nettoyer le cache npm pour réduire la taille de l'image
-RUN npm cache clean --force
+# 9. Définir la commande de démarrage
+CMD ["npm", "run", "dev"]

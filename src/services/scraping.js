@@ -30,7 +30,7 @@ export async function scrapAndUpsertSessions(url, xpathRows) {
       continue; // ignorer si une case est vide, y compris la 5ᵉ
     }
     
-    console.log("Scraped row:", texts);
+    console.log("Scraped row:", texts, new Date());
     const hour = texts[0] || "Unknown";
     const room = texts[1] || null;
     const matiere = texts[2] || null;
@@ -38,12 +38,12 @@ export async function scrapAndUpsertSessions(url, xpathRows) {
     const classe = texts[4] || hour;
 
     const start = parseStartHour(hour);
-    if (!start || start.hh >= 13) {
-      continue;
-    }
+    //if (!start || start.hh >= 13) {
+    //  continue;
+    //}
     const today = new Date();
 today.setHours(0, 0, 0, 0);
-    await prisma.session.upsert({
+    const saved = await prisma.session.upsert({
       where: { subject_date: { subject: classe, date: today } }, // clé composite      
       update: {
         hour, room, matiere, teacher
@@ -57,6 +57,8 @@ today.setHours(0, 0, 0, 0);
         date: today
       }
     });
+      console.log("sessions:", saved);
+
   }
 
   await browser.close();

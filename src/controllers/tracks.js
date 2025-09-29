@@ -3,6 +3,11 @@ import prisma from "../config/prisma.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
+ const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
 
 // Create a track (requires auth)
 router.post("/", auth, async (req, res) => {
@@ -36,7 +41,10 @@ router.post("/", auth, async (req, res) => {
 router.get("/session/:sessionId", async (req, res) => {
   const sessionId = Number(req.params.sessionId);
   const tracks = await prisma.track.findMany({
-    where: { sessionId },
+    where: { sessionId,submittedAt: {
+        gte: startOfDay,
+        lte: endOfDay
+      } },
     include: { votes: true, submittedBy: true },
   });
 
