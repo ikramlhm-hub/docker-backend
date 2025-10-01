@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Connexion — Playlist Étudiants</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa, #e8ecf5);
+      font-family: "Segoe UI", Roboto, sans-serif;
+    }
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      width: 320px;
+      text-align: center;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .login-box h1 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #1db954;
+    }
+
+    .login-box p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #1db954;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: 10px;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #159c42;
+    }
+
+    #error {
+      color: red;
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 13px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>Connexion</h1>
+    <p>Choisissez votre email pour vous connecter</p>
+
+    <select id="userSelect">
+      <option value="">Sélectionnez votre compte</option>
+    </select>
+
+    <button id="loginBtn">Se connecter</button>
+
+    <div id="error"></div>
+  </div>
+
+  <script>
+    // ⚡ Utilitaire fetch JSON
+    async function fetchJson(url, opts = {}) {
+      const r = await fetch(url, opts);
+      if (!r.ok) throw new Error(`Erreur ${r.status}`);
+      return r.json();
+    }
+
+    // ✅ Charger la liste des utilisateurs au démarrage
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const users = await fetchJson("/api/users");
+        const sel = document.getElementById("userSelect");
+        users.forEach(u => {
+          const o = document.createElement("option");
+          o.value = u.email;
+          o.textContent = `${u.firstname} ${u.lastname} — ${u.email}`;
+          sel.appendChild(o);
+        });
+      } catch (err) {
+        document.getElementById("error").textContent = "Impossible de charger les utilisateurs.";
+      }
+    });
+
+    // 🔐 Connexion
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("userSelect").value;
+      const errorDiv = document.getElementById("error");
+      errorDiv.textContent = "";
+
+      if (!email) {
+        errorDiv.textContent = "Veuillez sélectionner un utilisateur.";
+        return;
+      }
+
+      try {
+        // 1️⃣ On demande un token au backend
+        const res = await fetchJson("/api/auth/request-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+
+        if (!res.token) {
+          errorDiv.textContent = "Erreur lors de la demande de connexion.";
+          return;
+        }
+
+        // 2️⃣ Pour le dev → on colle directement le token
+        const token = prompt("Collez le token affiché par le backend :", res.token);
+        if (!token) return;
+
+        // 3️⃣ Vérification
+        const loginRes = await fetchJson(`/api/auth/login/${token}`, { method: "POST" });
+        if (loginRes?.token) {
+          localStorage.setItem("jwt", loginRes.token);
+          localStorage.setItem("user", JSON.stringify(loginRes.user));
+          window.location.href = "/index.html";
+        } else {
+          errorDiv.textContent = loginRes?.error || "Erreur de connexion.";
+        }
+      } catch (err) {
+        console.error(err);
+        errorDiv.textContent = "Erreur lors de la connexion.";
+      }
+    });
+  </script>
+</body>
+</html>

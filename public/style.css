@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #ffffff, #d4faff, #b5f0ff);
+  background-attachment: fixed;
+  color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 15px 30px;
+  border-bottom: 2px solid #aeeeff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#logout {
+  background: #00c6d7;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+#logout:hover {
+  background: #009eb4;
+  transform: scale(1.05);
+}
+
+#status {
+  font-size: 14px;
+  color: #333;
+}
+
+/* LAYOUT */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 40px 20px;
+}
+
+/* GAUCHE */
+.left {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(15px);
+  padding: 25px;
+  border-radius: 20px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.left h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.left select,
+.left input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #ffffffcc;
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.left select:focus,
+.left input:focus {
+  outline: none;
+  border-color: #00c6d7;
+  box-shadow: 0 0 0 3px rgba(0, 198, 215, 0.2);
+}
+
+.left button {
+  margin-top: 15px;
+  background: linear-gradient(90deg, #00c6d7, #69e6ff);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  width: 100%;
+}
+.left button:hover {
+  background: linear-gradient(90deg, #00abc1, #4dd4ef);
+  transform: scale(1.05);
+}
+
+.timer-label {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+}
+#timer {
+  font-size: 18px;
+  font-weight: 700;
+  color: #007c91;
+  margin-top: 5px;
+}
+
+/* DROITE */
+.right {
+  flex: 1;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(15px);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.vote-top {
+  font-size: 14px;
+  text-align: right;
+  color: #444;
+}
+
+.search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #ffffffcc;
+  color: #1a1a1a;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.search:focus {
+  border-color: #00c6d7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 198, 215, 0.2);
+}
+
+/* TRACK GRID */
+.track-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+/* 🎧 TRACK CARD */
+.track-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 15px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e0f4f7;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.25s, box-shadow 0.3s;
+}
+.track-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.track-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.track-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #000;
+}
+.track-artist {
+  font-size: 13px;
+  color: #444;
+}
+
+/* 👍 Zone vote stylée */
+.vote-zone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vote-btn {
+  background: white;
+  border: 2px solid #00c6d7;
+  color: #00c6d7;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+.vote-btn:hover {
+  background: #00c6d7;
+  color: white;
+  transform: scale(1.1);
+}
+
+.vote-count {
+  font-weight: 600;
+  color: #007c91;
+  font-size: 15px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+  .left, .right {
+    width: 90%;
+    max-width: 400px;
+  }
+}
